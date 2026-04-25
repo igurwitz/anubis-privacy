@@ -1,36 +1,84 @@
-Privacy Policy for Anubis Chrome Extension
-Effective Date: 04/04/2025
+# Anubis — Privacy Policy
 
-Thank you for using the Anubis Chrome extension ("Extension"), a tool that helps you find the best deals on AliExpress. This Privacy Policy explains how we collect, use, and protect your information when you use the Extension. By using the Extension, you consent to the practices described in this Privacy Policy.
+_Last updated: 2026-04-25_
 
-1. Data We Collect
-Anubis does not collect any personal information. The Extension only collects the data necessary for it to function as described:
+Anubis is a Chrome extension that builds a crowd-sourced price-history chart
+for AliExpress products. This document describes exactly what data the
+extension transmits, why, where it goes, and what is **not** collected.
 
-Active Tab Data: The activeTab permission allows the extension to interact with the currently active tab. This enables the extension to gather product details (such as product name, price, and seller information) from AliExpress pages that you are actively viewing.
+## What Anubis sends
 
-Storage: The storage permission allows us to store user preferences and settings locally on your device, such as saved deal alerts and preferred filters. This data is only stored on your device and is not shared with any third parties.
+When you visit a product page on AliExpress (and only those pages), Anubis
+extracts and transmits the following fields to the server at
+`https://anubisprice.duckdns.org`:
 
-2. How We Use Your Data
-Product Information: We gather product information only for the purpose of displaying relevant deals, price history, and discounts for products you view on AliExpress.
+- AliExpress product ID (numeric, from the URL)
+- Product title (as shown on the page)
+- Price and currency (as shown on the page)
+- Shipping cost (as shown on the page, if any)
+- Selected variant attributes (e.g. `Color: White`, `Size: M`)
+- The product page URL with all query-string and hash fragments removed
+  (e.g. `https://he.aliexpress.com/item/1005010599100890.html` — never the
+  `?spm=…` / `?pdp_ext_f=…` tracking parameters)
+- The page domain (e.g. `he.aliexpress.com`)
+- The page language code (e.g. `en`, `he`)
+- An anonymous install identifier — a random UUID generated the first time
+  the extension runs and stored locally in your browser. It is **not** linked
+  to your Google account, IP, name, or any other identity.
 
-User Preferences: We use the data stored in the local storage to enhance your experience with the Extension, remembering your preferences and settings across sessions (such as custom filters or alert preferences).
+When you open the price-history panel, the extension additionally sends the
+product ID, domain, currency, and selected variant key to fetch matching
+history. No other data is included in history requests.
 
-No Personal Identifiable Information: We do not collect or store any personally identifiable information (PII), such as your name, email, or payment details.
+## What Anubis does NOT collect
 
-3. Third-Party Services
-The Extension does not share, sell, or transfer any personal information to third parties. However, we may display links to AliExpress and other external websites. We are not responsible for the privacy practices of those websites. We encourage users to review the privacy policies of any third-party sites they visit.
+- Your name, email, phone number, or Google account
+- Your AliExpress account, login credentials, or order history
+- Payment information of any kind
+- Pages outside `*.aliexpress.*` domains
+- The URLs of non-product pages (search results, your cart, etc.)
+- Browsing data when you are not logged into AliExpress (the extension
+  intentionally skips data extraction on non-logged-in views)
+- Cookies, local storage, or session tokens
+- Mouse movements, keystrokes, screen recordings, or analytics events
 
-4. Permissions
-The Anubis Extension requests the following permissions:
+## Server-side handling
 
-activeTab: This allows the Extension to access the content of the active tab (AliExpress product pages) to extract relevant data.
+Submitted observations are stored in a PostgreSQL database with the fields
+listed above plus a server-assigned timestamp. Server logs retain the
+request method, request path (without query string), a salted truncated
+hash of the client IP, and the install identifier prefix. The salt rotates
+on every server restart, so log entries cannot be linked back to an IP
+address after a restart and cannot be joined across deployments.
 
-storage: This allows the Extension to save your preferences and settings locally on your device.
+The server is operated by the extension author on personal infrastructure
+located in Israel. No third-party analytics, advertising, or tracking
+services receive any data.
 
-host permissions (for AliExpress): This permission enables the Extension to interact with AliExpress product pages to display deals and discounts.
+## Data sharing
 
-5. Security
-We take the security of your data seriously. The data stored locally on your device (such as preferences and settings) is kept private and is not shared with any third parties. We do not have access to any personal data or browsing activity that is not part of the functionality of the Extension.
+Aggregated price history is returned to other Anubis users when they view
+the same product. Individual observations are not attributable to a
+specific user, install, or IP in this returned history.
 
-6. Changes to This Privacy Policy
-We may update this Privacy Policy from time to time. If we make significant changes to how we handle your data, we will notify you through the Extension or by other means. Please review this Privacy Policy periodically for any updates.
+No data is sold, rented, or otherwise disclosed to third parties.
+
+## Your choices
+
+- To stop all data collection, uninstall the extension. All locally stored
+  state (including the install identifier) is removed when Chrome
+  uninstalls the extension.
+- To request deletion of historical data associated with your install
+  identifier, contact the address below with the UUID. You can find it in
+  Chrome DevTools → Application → Storage → Extension storage →
+  `anubis_install_id`.
+
+## Contact
+
+For questions or data-deletion requests, contact:
+`pavelgurwitz@gmail.com`
+
+## Changes
+
+Material changes to this policy will be published in the extension's release
+notes and at the top of this document.
